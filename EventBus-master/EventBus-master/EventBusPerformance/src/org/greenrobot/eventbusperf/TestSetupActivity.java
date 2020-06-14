@@ -25,6 +25,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import org.greenrobot.debug.DebugActivity;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
@@ -60,6 +61,14 @@ public class TestSetupActivity extends Activity {
             }
 
             public void onNothingSelected(AdapterView<?> arg0) {
+            }
+        });
+
+
+        findViewById(R.id.buttonDebugActivity).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(TestSetupActivity.this, DebugActivity.class));
             }
         });
     }

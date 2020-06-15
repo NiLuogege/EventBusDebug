@@ -41,4 +41,13 @@ public final class SubscriberExceptionEvent {
         this.causingSubscriber = causingSubscriber;
     }
 
+    @Override
+    public String toString() {
+        return "SubscriberExceptionEvent{" +
+                "eventBus=" + eventBus +
+                ", throwable=" + throwable +
+                ", causingEvent=" + causingEvent +
+                ", causingSubscriber=" + causingSubscriber +
+                '}';
+    }
 }

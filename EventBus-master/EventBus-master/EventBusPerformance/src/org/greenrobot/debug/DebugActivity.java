@@ -31,8 +31,10 @@ public class DebugActivity extends BaseActivity {
 //                .eventInheritance(false)
                 .installDefaultEventBus();
 
-        eventBus.register(this);
+//        eventBus.register(this);
 //        eventBus.register(new BadExceptionSubscriber());
+        eventBus.register(new Subscriber1());
+        eventBus.register(new Subscriber2());
 
         findViewById(R.id.btn_post).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,49 +62,49 @@ public class DebugActivity extends BaseActivity {
     }
 
 
-    /**
-     * 主线程 形参类型为 String
-     *
-     * @param msg
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventStr(String msg) {
-        toast(msg);
-    }
-
-
-    /**
-     * 主线程 形参类型为 AEventBean
-     *
-     * @param msg
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventStr(AEventBean msg) {
-        log(msg.toString());
-    }
-
-    /**
-     * 主线程 形参类型为 BEventBean
-     *
-     * @param msg
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventStr(BEventBean msg) {
-        toast(msg.toString());
-    }
-
-
-    /**
-     * 主线程 形参类型为 SubscriberExceptionEvent
-     *
-     * @param msg
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEvent(SubscriberExceptionEvent msg) {
-
-        Log.e(TAG, "订阅函数有异常 " + msg.toString());
-
-    }
+//    /**
+//     * 主线程 形参类型为 String
+//     *
+//     * @param msg
+//     */
+//    @Subscribe(threadMode = ThreadMode.MAIN)
+//    public void onEventStr(String msg) {
+//        toast(msg);
+//    }
+//
+//
+//    /**
+//     * 主线程 形参类型为 AEventBean
+//     *
+//     * @param msg
+//     */
+//    @Subscribe(threadMode = ThreadMode.MAIN)
+//    public void onEventStr(AEventBean msg) {
+//        log(msg.toString());
+//    }
+//
+//    /**
+//     * 主线程 形参类型为 BEventBean
+//     *
+//     * @param msg
+//     */
+//    @Subscribe(threadMode = ThreadMode.MAIN)
+//    public void onEventStr(BEventBean msg) {
+//        toast(msg.toString());
+//    }
+//
+//
+//    /**
+//     * 主线程 形参类型为 SubscriberExceptionEvent
+//     *
+//     * @param msg
+//     */
+//    @Subscribe(threadMode = ThreadMode.MAIN)
+//    public void onEvent(SubscriberExceptionEvent msg) {
+//
+//        Log.e(TAG, "订阅函数有异常 " + msg.toString());
+//
+//    }
 
 
 }

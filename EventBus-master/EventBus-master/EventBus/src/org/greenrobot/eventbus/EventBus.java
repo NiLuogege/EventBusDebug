@@ -39,7 +39,9 @@ import java.util.logging.Level;
  */
 public class EventBus {
 
-    /** Log tag, apps may override it. */
+    /**
+     * Log tag, apps may override it.
+     */
     public static String TAG = "EventBus";
 
     static volatile EventBus defaultInstance;
@@ -77,7 +79,9 @@ public class EventBus {
     private final int indexCount;
     private final Logger logger;
 
-    /** Convenience singleton for apps using a process-wide EventBus instance. */
+    /**
+     * Convenience singleton for apps using a process-wide EventBus instance.
+     */
     //使用DCL 方式创建单例
     public static EventBus getDefault() {
         EventBus instance = defaultInstance;
@@ -96,7 +100,9 @@ public class EventBus {
         return new EventBusBuilder();
     }
 
-    /** For unit test primarily. */
+    /**
+     * For unit test primarily.
+     */
     public static void clearCaches() {
         SubscriberMethodFinder.clearCaches();
         eventTypesCache.clear();
@@ -120,6 +126,7 @@ public class EventBus {
         backgroundPoster = new BackgroundPoster(this);
         asyncPoster = new AsyncPoster(this);
         indexCount = builder.subscriberInfoIndexes != null ? builder.subscriberInfoIndexes.size() : 0;
+        //订阅方法查找器
         subscriberMethodFinder = new SubscriberMethodFinder(builder.subscriberInfoIndexes,
                 builder.strictMethodVerification, builder.ignoreGeneratedIndex);
         logSubscriberExceptions = builder.logSubscriberExceptions;
@@ -143,6 +150,7 @@ public class EventBus {
     public void register(Object subscriber) {
         //获取接受者的字节码对象
         Class<?> subscriberClass = subscriber.getClass();
+        //查找 传入的subscriber 中的订阅方法 ，这里没有加锁 说明可以并发进行
         List<SubscriberMethod> subscriberMethods = subscriberMethodFinder.findSubscriberMethods(subscriberClass);
         synchronized (this) {
             for (SubscriberMethod subscriberMethod : subscriberMethods) {
@@ -224,7 +232,9 @@ public class EventBus {
         return typesBySubscriber.containsKey(subscriber);
     }
 
-    /** Only updates subscriptionsByEventType, not typesBySubscriber! Caller must update typesBySubscriber. */
+    /**
+     * Only updates subscriptionsByEventType, not typesBySubscriber! Caller must update typesBySubscriber.
+     */
     private void unsubscribeByEventType(Object subscriber, Class<?> eventType) {
         List<Subscription> subscriptions = subscriptionsByEventType.get(eventType);
         if (subscriptions != null) {
@@ -241,7 +251,9 @@ public class EventBus {
         }
     }
 
-    /** Unregisters the given subscriber from all event classes. */
+    /**
+     * Unregisters the given subscriber from all event classes.
+     */
     public synchronized void unregister(Object subscriber) {
         List<Class<?>> subscribedTypes = typesBySubscriber.get(subscriber);
         if (subscribedTypes != null) {
@@ -254,7 +266,9 @@ public class EventBus {
         }
     }
 
-    /** Posts the given event to the event bus. */
+    /**
+     * Posts the given event to the event bus.
+     */
     public void post(Object event) {
         PostingThreadState postingState = currentPostingThreadState.get();
         List<Object> eventQueue = postingState.eventQueue;
@@ -465,7 +479,9 @@ public class EventBus {
         }
     }
 
-    /** Looks up all Class objects including super classes and interfaces. Should also work for interfaces. */
+    /**
+     * Looks up all Class objects including super classes and interfaces. Should also work for interfaces.
+     */
     private static List<Class<?>> lookupAllEventTypes(Class<?> eventClass) {
         synchronized (eventTypesCache) {
             List<Class<?>> eventTypes = eventTypesCache.get(eventClass);
@@ -483,7 +499,9 @@ public class EventBus {
         }
     }
 
-    /** Recurses through super interfaces. */
+    /**
+     * Recurses through super interfaces.
+     */
     static void addInterfaces(List<Class<?>> eventTypes, Class<?>[] interfaces) {
         for (Class<?> interfaceClass : interfaces) {
             if (!eventTypes.contains(interfaceClass)) {
@@ -544,7 +562,9 @@ public class EventBus {
         }
     }
 
-    /** For ThreadLocal, much faster to set (and get multiple values). */
+    /**
+     * For ThreadLocal, much faster to set (and get multiple values).
+     */
     final static class PostingThreadState {
         final List<Object> eventQueue = new ArrayList<>();
         boolean isPosting;

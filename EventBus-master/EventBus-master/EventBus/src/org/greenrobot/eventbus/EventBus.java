@@ -139,7 +139,9 @@ public class EventBus {
      * The {@link Subscribe} annotation also allows configuration like {@link
      * ThreadMode} and priority.
      */
+    //注册 接收者
     public void register(Object subscriber) {
+        //获取接受者的字节码对象
         Class<?> subscriberClass = subscriber.getClass();
         List<SubscriberMethod> subscriberMethods = subscriberMethodFinder.findSubscriberMethods(subscriberClass);
         synchronized (this) {

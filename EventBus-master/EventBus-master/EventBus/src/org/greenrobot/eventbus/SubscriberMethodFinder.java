@@ -45,6 +45,7 @@ class SubscriberMethodFinder {
     private final boolean ignoreGeneratedIndex;
 
     private static final int POOL_SIZE = 4;
+    //FindState 的缓存池
     private static final FindState[] FIND_STATE_POOL = new FindState[POOL_SIZE];
 
     SubscriberMethodFinder(List<SubscriberInfoIndex> subscriberInfoIndexes, boolean strictMethodVerification,
@@ -99,14 +100,18 @@ class SubscriberMethodFinder {
             }
             findState.moveToSuperclass();
         }
+        //返回 所有 订阅方法
         return getMethodsAndRelease(findState);
     }
 
     private List<SubscriberMethod> getMethodsAndRelease(FindState findState) {
+        //赋值订阅方法 到 subscriberMethods
         List<SubscriberMethod> subscriberMethods = new ArrayList<>(findState.subscriberMethods);
+        //释放 findState
         findState.recycle();
         synchronized (FIND_STATE_POOL) {
             for (int i = 0; i < POOL_SIZE; i++) {
+                //findState 放到缓存池中
                 if (FIND_STATE_POOL[i] == null) {
                     FIND_STATE_POOL[i] = findState;
                     break;
@@ -117,15 +122,17 @@ class SubscriberMethodFinder {
     }
 
     private FindState prepareFindState() {
+        //从 FindState 缓冲池中获取 一个FindState
         synchronized (FIND_STATE_POOL) {
             for (int i = 0; i < POOL_SIZE; i++) {
                 FindState state = FIND_STATE_POOL[i];
-                if (state != null) {//这是是说有正在 工作的 findstate吗？
+                if (state != null) {
                     FIND_STATE_POOL[i] = null;
                     return state;
                 }
             }
         }
+        //如果缓冲池中没有 就直接 new一个
         return new FindState();
     }
 
@@ -158,7 +165,9 @@ class SubscriberMethodFinder {
         //初始化 findState
         findState.initForSubscriber(subscriberClass);
         while (findState.clazz != null) {
+            //找到 订阅方法 并缓存到 findState 中
             findUsingReflectionInSingleClass(findState);
+            //切换到父类 继续检查 订阅方法
             findState.moveToSuperclass();
         }
         return getMethodsAndRelease(findState);
@@ -206,8 +215,11 @@ class SubscriberMethodFinder {
                     if (subscribeAnnotation != null) {//有注解
                         //获取 订阅方法 形参
                         Class<?> eventType = parameterTypes[0];
+                        //解析数据并缓存到 anyMethodByEventType 和 subscriberClassByMethodKey
                         if (findState.checkAdd(method, eventType)) {
+                            //获取 ThreadMode
                             ThreadMode threadMode = subscribeAnnotation.threadMode();
+                            //创建 SubscriberMethod 并存入 findState.subscriberMethods 中
                             findState.subscriberMethods.add(new SubscriberMethod(method, eventType, threadMode,
                                     subscribeAnnotation.priority(), subscribeAnnotation.sticky()));
                         }
@@ -230,6 +242,7 @@ class SubscriberMethodFinder {
     }
 
     static class FindState {
+        //记录一个订阅者何其父类中 所有的 订阅方法
         final List<SubscriberMethod> subscriberMethods = new ArrayList<>();
         //订阅方法形参类型和 订阅方法的 映射
         final Map<Class, Object> anyMethodByEventType = new HashMap<>();
@@ -239,7 +252,7 @@ class SubscriberMethodFinder {
 
         Class<?> subscriberClass;
         Class<?> clazz;
-        boolean skipSuperClasses;
+        boolean skipSuperClasses;//是否跳过 检查 订阅者的父类
         SubscriberInfo subscriberInfo;
 
         /**
@@ -317,14 +330,16 @@ class SubscriberMethodFinder {
             }
         }
 
+        /**
+         * 切换到父类 继续检查 订阅方法
+         */
         void moveToSuperclass() {
-            if (skipSuperClasses) {
+            if (skipSuperClasses) {//跳过检查订阅者的父类
                 clazz = null;
-            } else {
+            } else {//切换到父类 继续检查 订阅方法
                 clazz = clazz.getSuperclass();
                 String clazzName = clazz.getName();
-                // Skip system classes, this degrades performance.
-                // Also we might avoid some ClassNotFoundException (see FAQ for background).
+                //排除 java 和 android 系统类
                 if (clazzName.startsWith("java.") || clazzName.startsWith("javax.") ||
                         clazzName.startsWith("android.") || clazzName.startsWith("androidx.")) {
                     clazz = null;

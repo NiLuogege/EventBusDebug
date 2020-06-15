@@ -78,6 +78,7 @@ public class EventBus {
     private final Logger logger;
 
     /** Convenience singleton for apps using a process-wide EventBus instance. */
+    //使用DCL 方式创建单例
     public static EventBus getDefault() {
         EventBus instance = defaultInstance;
         if (instance == null) {

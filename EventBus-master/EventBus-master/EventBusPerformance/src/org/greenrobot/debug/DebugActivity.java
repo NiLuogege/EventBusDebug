@@ -28,7 +28,7 @@ public class DebugActivity extends BaseActivity {
 //                .logSubscriberExceptions(true)
 //                .logNoSubscriberMessages(true)
 //                .throwSubscriberException(false)
-                .eventInheritance(false)
+//                .eventInheritance(false)
                 .installDefaultEventBus();
 
         eventBus.register(this);
